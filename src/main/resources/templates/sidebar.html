@@ -1,0 +1,58 @@
+<div class="j-bg-light sidebar-border-right" id="sidebar-wrapper" th:fragment="sidebar">
+    <div class="logo"><div class="sidebar-heading TG_logo"></div></div>
+    <div class="list-group list-group-flush">
+        <a th:href="@{/}" th:class="${class} == index ? 'list-group-item list-group-item-action ' : 'list-group-item nav-a' ">
+            Dashboard
+        </a>
+        <a th:href="@{/inventories}" th:class="${#httpServletRequest.getRequestURI() == '/inventories' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Warehouses
+        </a>
+        <a th:href="@{/items}" th:class="${#httpServletRequest.getRequestURI() == '/items' ? 'list-group-item list-group-item-action':'list-group-item nav-a'}">
+            Items
+        </a>
+        <a th:href="@{/attributes}" th:class="${#httpServletRequest.getRequestURI() == '/attributes' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Attributes
+        </a>
+        <a th:href="@{/customers}" th:class="${#httpServletRequest.getRequestURI() == '/customers' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Customers
+        </a>
+        <a th:href="@{/vendors}" th:class="${#httpServletRequest.getRequestURI() == '/vendors' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Vendors
+        </a>
+        <a th:href="@{/purchases}" th:class="${#httpServletRequest.getRequestURI() == '/purchases' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Purchases
+        </a>
+        <a th:href="@{/orders}" th:class="${#httpServletRequest.getRequestURI() == '/orders' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Orders
+        </a>
+        <a th:href="@{/tracking}" th:class="${#httpServletRequest.getRequestURI() == '/tracking' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Tracking
+        </a>
+        <a th:href="@{/users}" th:class="${#httpServletRequest.getRequestURI() == '/users' ? 'list-group-item list-group-item-action ':'list-group-item nav-a'}">
+            Users</a>
+    </div>
+</div>
+
+
+<div th:fragment="mobile-sidebar" class="mobile-sidebar">
+    <script>
+        function showMenu() {
+            let x = document.getElementById("mobile-nav");
+            console.log(x.className)
+            if (x.className === "mobile-sidebar-nav hidden"){
+                return x.className = "mobile-sidebar-nav";
+            }
+            x.className = "mobile-sidebar-nav hidden"
+        }
+    </script>
+    <div class="mobile-sidebar-nav hidden" id="mobile-nav">
+        <a th:href="@{/}" class="list-group-item nav-a">Dashboard</a>
+        <a th:href="@{/inventories}" class="list-group-item nav-a">Warehouses</a>
+        <a th:href="@{/items}" class="list-group-item nav-a">Items</a>
+        <a th:href="@{/attributes}" class="list-group-item nav-a">Attributes</a>
+        <a th:href="@{/customers}" class="list-group-item nav-a">Customers</a>
+    </div>
+    <a href="javascript:void(0);" class="icon" th:onclick="showMenu()" >
+        <i class="fa fa-bars"></i>
+    </a>
+</div>

@@ -1,0 +1,32 @@
+<nav class="j-navbar navbar-expand-lg navbar-light  nav-border-bottom" th:fragment="navbar">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+<!--            <li class="nav-item active">-->
+<!--                <a class="nav-link" href="#">Home<span class="sr-only">(current)</span></a>-->
+<!--            </li>-->
+<!--            <li class="nav-item">-->
+<!--                <a class="nav-link" href="#">Link</a>-->
+<!--            </li>-->
+            <li class="nav-item dropdown">
+                <a sec:authorize="isAnonymous()" class="dropdown-item" th:href="@{/login}" >
+                    <img class="loginIcon" src="https://img.icons8.com/fluent/48/000000/login-rounded-right.png"/>
+                    Login</a>
+                <a sec:authorize="isAuthenticated()" class="nav-link dropdown-toggle" th:text="${username}" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <!-- <span>Welcome<div th:text="${#authentication.getName()}"></div></span>-->
+<!--                    <div th:text="${username}"></div>-->
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right user-profile" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">
+                        <form sec:authorize="isAuthenticated()" class=""  th:action="@{/logout}" method="POST">
+                            <button style="padding: 0px" type="submit" class="btn btn-link">
+                                <img class="loginIcon" src="https://img.icons8.com/cute-clipart/64/000000/login-rounded.png"/>
+                                Logout</button>
+                        </form>
+                    </a>
+                </div>
+
+            </li>
+        </ul>
+    </div>
+</nav>
