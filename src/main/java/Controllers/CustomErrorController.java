@@ -23,8 +23,6 @@ public class CustomErrorController implements ErrorController {
         Object status2 = request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
         if (status != null) {
             Integer statusCode = Integer.valueOf(status.toString());
-            System.out.println(status2.toString());
-            System.out.println(statusCode);
            if(statusCode == HttpStatus.FORBIDDEN.value()) {
                 return new RedirectView("/forbidden");
             }
