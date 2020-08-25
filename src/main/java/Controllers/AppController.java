@@ -1,18 +1,24 @@
 package Controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
-
+import java.io.IOException;
 
 @Controller
 public class AppController {
+
+	@Autowired
+	ResourceLoader resourceLoader;
+
 
 	@RequestMapping(value = "/" , method = RequestMethod.GET)
 	public String index(Model model) {
@@ -45,6 +51,15 @@ public class AppController {
 	public String notFound(Model model)
 	{
 		return "notfound";
+	}
+
+
+	@ResponseBody
+	@RequestMapping(value = "/img/{imageName}",method = RequestMethod.GET)
+	public ResponseEntity<byte[]> loadImage(@PathVariable String imageName) throws IOException {
+		Resource media = resourceLoader.getResource("classpath:resources/privateMedia/"+imageName);
+		byte[] image = media.getInputStream().readAllBytes();
+		return  ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(image);
 	}
 
 
