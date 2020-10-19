@@ -3,7 +3,6 @@ package Services;
 import Contracts.StorageInterface;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
@@ -58,9 +57,6 @@ public class StorageService implements StorageInterface {
     public void loadItemData(MultipartFile file){
         try{
             List<Map<String,String>> items = formatData(file);
-//            for (Map<String,String> item :items){
-//                itemService.save(item);
-//            }
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }

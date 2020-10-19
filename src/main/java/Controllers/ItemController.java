@@ -1,10 +1,14 @@
 package Controllers;
 
+import Contracts.ItemInterface;
 import Contracts.ServiceContract;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,9 +24,9 @@ import java.util.Map;
 public class ItemController {
 
     @Autowired
-    private ServiceContract itemService;
+    private ItemInterface itemService;
 
-    @RequestMapping(value = "/item/get", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/item/get", method = RequestMethod.GET)
     public JsonNode getItem(
             @RequestParam(required = false, name = "p") String page,
             @RequestParam(required = false, name = "in_id") String inventory_id,
@@ -38,29 +42,43 @@ public class ItemController {
         return itemService.get(filter);
     }
 
-    @RequestMapping(value = "/item/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/item/add", method = RequestMethod.POST)
     public JsonNode createItem(@RequestBody Map<String, JsonNode> item, Authentication authentication) {
         return itemService.save(item);
     }
 
-    @RequestMapping(value = "/item/update/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/item/update/{id}", method = RequestMethod.POST)
     public JsonNode updateItem(@PathVariable Long id, @RequestBody Map<String, JsonNode> item, Authentication authentication) {
         return itemService.update(id, item);
     }
 
-    @RequestMapping(value = "/item/delete/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/item/attach", method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    public JsonNode uploadItemMedia(@RequestParam("itemid") Long id,@RequestParam("rmimgs") int[] rmimgs,@RequestParam("file") MultipartFile[] files) throws Exception {
+        return itemService.attach(id,rmimgs,files);
+    }
+
+    @RequestMapping(value = "/api/item/delete/{id}", method = RequestMethod.DELETE)
     public JsonNode removeItem(@PathVariable Long id) {
         return itemService.remove(id);
     }
 
-    @RequestMapping(value = "/item/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/item/all", method = RequestMethod.GET)
     public JsonNode countOfItems() {
         return itemService.count();
     }
 
-    @RequestMapping(value = "/item/search", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/item/search", method = RequestMethod.POST)
     public JsonNode findAllItemsByItemid(@RequestBody Map<String, String> search) {
         return itemService.search(search);
     }
 
+    /* -------- Upload CSV */
+    //	@RequestMapping(value = "/upload/item",method = RequestMethod.POST)
+    //	public void uploadItemCsv(@RequestParam("file") MultipartFile file){
+    //		try{
+    //			storageService.store(file).loadItemData(file);
+    //		}catch (Exception e){
+    //			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    //		}
+    //	}
 }

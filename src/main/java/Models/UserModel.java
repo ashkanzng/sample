@@ -30,6 +30,9 @@ public class UserModel {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "active", columnDefinition = "boolean default true", unique = false)
+    private Boolean active;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -65,6 +68,14 @@ public class UserModel {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String getCreated_at() {

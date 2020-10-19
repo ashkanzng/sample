@@ -9,6 +9,7 @@ import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
 import org.hibernate.annotations.*;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -22,57 +23,52 @@ import java.util.Set;
 
 
 @Entity
-@Table(name = "items",indexes ={
-        @Index(name="itemid_index",columnList="itemid", unique = true)
-    })
+@Table(name = "items", indexes = {
+        @Index(name = "itemid_index", columnList = "itemid", unique = true),
+        @Index(name = "name_index", columnList = "name", unique = true),
+        @Index(name = "category_id_index", columnList = "category_id", unique = true)
+})
 public class ItemModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="name", columnDefinition = "varchar(64)", nullable=true, unique=false)
+    @Column(name = "name", columnDefinition = "varchar(64)", nullable = true, unique = false)
     private String name;
 
-    @Column(name="itemid", columnDefinition = "varchar(64)", nullable=false, unique=true)
+    @Column(name = "itemid", columnDefinition = "varchar(64)", nullable = false, unique = true)
     private String itemid;
 
-    @Column(name="serial_number", columnDefinition = "varchar(64)", nullable=true, unique=false)
+    @Column(name = "category_id", columnDefinition = "integer default 1", nullable = false)
+    private Integer categoryId;
+
+    @Column(name = "serial_number", columnDefinition = "varchar(64)", nullable = true, unique = false)
     private String serialNumber;
 
-    @Column(name="qty_on_hand", columnDefinition="Decimal(10,2)", nullable=true, unique=false)
+    @Column(name = "qty_on_hand", columnDefinition = "Decimal(10,2)", nullable = true, unique = false)
     private Double quantityOnHand;
 
-    @Column(name="reorder_qty", columnDefinition="Decimal(10,2)", nullable=true, unique=false)
+    @Column(name = "reorder_qty", columnDefinition = "Decimal(10,2)", nullable = true, unique = false)
     private Double reorderQuantity;
 
     @Type(type = "json")
-    @Column(name="details", columnDefinition = "JSON", nullable=true, unique=false)
+    @Column(name = "details", columnDefinition = "JSON", nullable = true, unique = false,length=9999)
     private String details;
 
-//    @Column(name="description", columnDefinition = "varchar(64)", nullable=true, unique=false)
-//    private String description;
-//
-//    @Column(name="sku", columnDefinition = "varchar(64)", nullable=true, unique=false)
-//    private String sku;
-//
-//    @Column(name="description_for_sales", columnDefinition = "varchar(64)", nullable=true, unique=false)
-//    private String description_for_sales;
-//
+    @Type(type = "json")
+    @Column(name = "metadata", columnDefinition = "JSON", nullable = true, unique = false)
+    private String metadata;
+
+
 //    @Column(name="item_class", columnDefinition = "varchar(64)", nullable=true, unique=false)
 //    private String item_class;
 //
 //    @Column(name="activision", columnDefinition = "TINYINT(1)", nullable=true, unique=false)
 //    private Integer activision;
-//
-//    @Column(name="item_type", columnDefinition = "varchar(11)", nullable=true, unique=false)
-//    private String item_type;
-//
+
 //    @Column(name="retail", columnDefinition="Decimal(10,2)", nullable=true, unique=false)
 //    private Double retail;
-//
-//    @Column(name="quote_infolder", columnDefinition="Decimal(10,2)", nullable=true, unique=false)
-//    private Double quote_infolder;
 //
 //    @Column(name="stocking_um", columnDefinition = "varchar(64)", nullable=true, unique=false)
 //    private String stocking_um;
@@ -98,32 +94,24 @@ public class ItemModel {
 //    @Column(name="commission", columnDefinition = "boolean default false", nullable=true, unique=false)
 //    private Boolean commission;
 
-//    @Column(name="min_stock",columnDefinition = "integer default 11",nullable=true, unique=false)
-//    private Integer min_stock;
-//
 
-//
-//    @Column(name="location", columnDefinition = "varchar(64)", nullable=true, unique=false)
-//    private String location;
-
-
-    @Column(name="inventory_id",columnDefinition = "integer default 11",nullable=false)
+    @Column(name = "inventory_id", columnDefinition = "integer default 11", nullable = false)
     private Integer inventoryId;
 
     //@Formula(value = "(select JSON_OBJECT( 'name',inventories.name ,'id',inventories.id) from inventories where inventories.id = inventory_id)")
     @Formula(value = "(select inventories.name from inventories where inventories.id = inventory_id)")
     private String inventoryName;
 
-    @OneToMany(mappedBy = "item" , cascade = CascadeType.ALL ,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @OrderBy("id ASC")
     private Set<ItemAttributeModel> attributes;
 
     @CreationTimestamp
-    @Column(name="created_at", nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp created_at;
 
     @UpdateTimestamp
-    @Column(name="updated_at", nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp updated_at;
 
     public Long getId() {
@@ -144,6 +132,14 @@ public class ItemModel {
 
     public void setItemid(String itemid) {
         this.itemid = itemid;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Integer getInventoryId() {
@@ -191,6 +187,15 @@ public class ItemModel {
         this.details = JacksonUtil.toString(details);
     }
 
+    public JsonNode getMetadata() {
+        if (metadata != null) return JacksonUtil.toJsonNode(metadata);
+        return null;
+    }
+
+    public void setMetadata(JsonNode metadata) {
+        this.metadata = JacksonUtil.toString(metadata);
+    }
+
     public Set<ItemAttributeModel> getAttributes() {
         return attributes;
     }
@@ -208,7 +213,7 @@ public class ItemModel {
 
     public String getUpdated_at() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        if (updated_at != null)return dateFormat.format(updated_at);
+        if (updated_at != null) return dateFormat.format(updated_at);
         return null;
     }
 }

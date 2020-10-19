@@ -31,6 +31,9 @@ public class CustomerModel {
     @Column(name = "customerid", columnDefinition = "varchar(64)", nullable = false, unique = true)
     private String customerid;
 
+    @Column(name = "userid", columnDefinition = "int(11)", nullable = false)
+    private Integer userid;
+
     @Type(type = "json")
     @Column(name = "contact_info", columnDefinition = "JSON", nullable = true, unique = false)
     private String contactInfo;
@@ -43,6 +46,9 @@ public class CustomerModel {
     @Pattern(regexp = "\\w+@\\w+\\.\\w+(,\\s*\\w+@\\w+\\.\\w+)*")
     @Column(name = "email", columnDefinition = "varchar(255)", nullable = true, unique = true, length = 512)
     private String email;
+
+    @Column(name = "emailverified", columnDefinition = "boolean default false", unique = false , nullable = true)
+    private Boolean emailVerified;
 
     @Type(type = "json")
     @Column(name = "sales_info", columnDefinition = "JSON", nullable = true, unique = false)
@@ -95,6 +101,14 @@ public class CustomerModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public void setContactInfo(JsonNode contactInfo) {
@@ -152,6 +166,14 @@ public class CustomerModel {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         if (updated_at != null) return dateFormat.format(updated_at);
         return null;
+    }
+
+    public Integer getUserid() {
+        return userid;
+    }
+
+    public void setUserid(Integer userid) {
+        this.userid = userid;
     }
 
     //public void setAddresses(Set<AddressCustomerModel> addresses) {

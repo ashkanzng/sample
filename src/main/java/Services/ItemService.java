@@ -1,5 +1,6 @@
 package Services;
 
+import Contracts.ItemInterface;
 import Contracts.ServiceContract;
 import Models.InventoryModel;
 import Models.ItemModel;
@@ -8,19 +9,28 @@ import Repository.InventoryRepository;
 import Repository.ItemAttributeRepository;
 import Repository.ItemRepository;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.istack.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Service
-public class ItemService extends CoreService implements ServiceContract {
+public class ItemService extends CoreService implements ItemInterface {
 
     ItemRepository itemRepository;
     InventoryRepository inventoryRepository;
@@ -29,6 +39,9 @@ public class ItemService extends CoreService implements ServiceContract {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     public ItemService(
             ItemRepository itemRepository,
@@ -82,6 +95,9 @@ public class ItemService extends CoreService implements ServiceContract {
 
     public JsonNode update(Object id, Map<String, JsonNode> jsonData) {
         try {
+            if (jsonData.get("inventoryId") != null) {
+                jsonData.remove("inventoryId");
+            }
             ItemModel item = itemRepository.findById((long) id).orElseThrow(() -> new Exception("Item not found!"));
             ObjectReader reader = mapper.readerForUpdating(item);
             ItemModel updatedItem = reader.readValue(mapper.writeValueAsString(jsonData));
@@ -130,7 +146,55 @@ public class ItemService extends CoreService implements ServiceContract {
     }
 
     public JsonNode count() {
-        return mapper.valueToTree(itemRepository.countItems());
+        return mapper.valueToTree(itemRepository.countItems(null));
     }
 
+    @Override
+    public JsonNode attach(long id,int[] rmimgs,MultipartFile[] files) throws Exception{
+
+        ItemModel item = itemRepository.findById(id).orElseThrow(() -> new Exception("Item not found!"));
+        ArrayNode fileNames = mapper.createArrayNode();
+        URI uri = resourceLoader.getResource("classpath:static/b_static/images/items/").getURI();
+        JsonNode metaData = item.getMetadata();
+        if (metaData != null){
+            for (int i = 0; i< metaData.size();i++){
+                int metaidx = i;
+                if (Arrays.stream(rmimgs).noneMatch(v-> v == metaidx)){
+                   fileNames.add(metaData.get(i));
+               }
+            }
+        }
+        for (MultipartFile file : files) {
+            Files.copy(file.getInputStream() , Paths.get(uri.getPath()+file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+            fileNames.add("/b_static/images/items/"+file.getOriginalFilename());
+        }
+        item.setMetadata(mapper.valueToTree(fileNames));
+        itemRepository.save(item);
+        return mapper.valueToTree(item.getMetadata());
+    }
+
+    /**
+     * This method use for shop page
+     */
+    @Override
+    public List<String> getItemsByParameter(String itemid,Integer categoryId,int offset,int limit){
+        return itemRepository.findItemsByParameter(itemid,categoryId,offset,limit);
+    }
+
+    /**
+     * This method use for shop page
+     */
+    @Override
+    public List<String> getLatestItems(int offset, int limit) {
+        return itemRepository.findLatestItems(offset,limit);
+    }
+
+    /**
+     * This method use for shop page
+     */
+    @Override
+    public Integer totalItems(@Nullable Integer categoryId) {
+        categoryId = (categoryId != null && categoryId==0)?null:categoryId;
+        return (int)itemRepository.countItems(categoryId);
+    }
 }
